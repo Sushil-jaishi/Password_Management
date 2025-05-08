@@ -25,6 +25,7 @@ const accountSchema = new mongoose.Schema(
         field: {
           type: String,
           required: true,
+          lowercase: true,
         },
         value: {
           type: String,
