@@ -1,5 +1,6 @@
 import mongoose from "mongoose"
 import { ownerList, serviceList } from "../constants.js"
+import { encrypt } from "../utils/encryption.js"
 
 const accountSchema = new mongoose.Schema(
   {

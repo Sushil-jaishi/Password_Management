@@ -1,5 +1,6 @@
 import { Account } from "../models/account.model.js"
 import asyncHandler from "../utils/asyncHandler.js"
+import { encrypt, decrypt, decryptCredentials } from "../utils/encryption.js"
 
 // Create a new account
 export const createAccount = asyncHandler(async (req, res) => {
@@ -25,11 +26,17 @@ export const createAccount = asyncHandler(async (req, res) => {
     )
   }
 
+  const encryptedCredentials = credentials.map((cred) => ({
+    field: cred.field,
+    value: encrypt(cred.value),
+    history: [],
+  }))
+
   const newAccount = new Account({
     service,
     owner,
     accountNumber,
-    credentials,
+    credentials: encryptedCredentials,
   })
 
   await newAccount.save()
@@ -48,7 +55,12 @@ export const getAccountsByOwner = asyncHandler(async (req, res) => {
     throw new Error("No accounts found for this owner.")
   }
 
-  res.status(200).json(accounts)
+  const decryptedAccounts = accounts.map((account) => ({
+    ...account.toObject(),
+    credentials: decryptCredentials(account.credentials),
+  }))
+
+  res.status(200).json(decryptedAccounts)
 })
 
 // Get all accounts for a specific service
@@ -62,7 +74,12 @@ export const getAccountsByService = asyncHandler(async (req, res) => {
     throw new Error(`No accounts found for service: ${service}`)
   }
 
-  res.status(200).json(accounts)
+  const decryptedAccounts = accounts.map((account) => ({
+    ...account.toObject(),
+    credentials: decryptCredentials(account.credentials),
+  }))
+
+  res.status(200).json(decryptedAccounts)
 })
 
 export const getAccountsByServiceAndOwner = asyncHandler(async (req, res) => {
@@ -75,7 +92,12 @@ export const getAccountsByServiceAndOwner = asyncHandler(async (req, res) => {
     throw new Error("No accounts found for this service and owner.")
   }
 
-  res.status(200).json(accounts)
+  const decryptedAccounts = accounts.map((account) => ({
+    ...account.toObject(),
+    credentials: decryptCredentials(account.credentials),
+  }))
+
+  res.status(200).json(decryptedAccounts)
 })
 
 // Update the credentials of an account
@@ -102,19 +124,20 @@ export const updateAccountCredentials = asyncHandler(async (req, res) => {
     )
 
     if (existingCredential) {
-      if (existingCredential.value === cred.value) {
+      if (decrypt(existingCredential.value) === cred.value) {
         return
       }
+
       existingCredential.history.push({
         oldValue: existingCredential.value,
         changedAt: new Date(),
       })
 
-      existingCredential.value = cred.value
+      existingCredential.value = encrypt(cred.value)
     } else {
       account.credentials.push({
         field: cred.field,
-        value: cred.value,
+        value: encrypt(cred.value),
         history: [],
       })
     }
