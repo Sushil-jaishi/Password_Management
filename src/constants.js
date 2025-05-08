@@ -1,0 +1,23 @@
+export const serviceList = [
+  "google",
+  "facebook",
+  "twitter",
+  "instagram",
+  "linkedin",
+  "github",
+  "discord",
+]
+
+export const ownerList = [
+  "sushil jaishi",
+  "chintamani jaishi",
+  "harikala jaishi",
+  "parwati jaishi",
+  "kriti jaishi",
+  "himani jaisi",
+  "aardhya jaisi",
+  "aarad jaisi",
+  "aakriti jaisi",
+  "anisha thapa magar",
+  "kunti thapa magar",
+]

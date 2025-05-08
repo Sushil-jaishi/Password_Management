@@ -18,8 +18,12 @@ router.get("/service/:service", getAccountsByService)
 
 router.get("/service/:service/owner/:owner", getAccountsByServiceAndOwner)
 
-router.put("/service/:service/owner/:owner", updateAccountCredentials)
+router.get("/owner/:owner/service/:service", getAccountsByServiceAndOwner)
 
-router.delete("/service/:service/owner/:owner", deleteAccount)
+router.put("/", updateAccountCredentials)
+
+router.delete("/service/:service/owner/:owner/:accountNumber", deleteAccount)
+
+router.delete("/owner/:owner/service/:service/:accountNumber", deleteAccount)
 
 export default router

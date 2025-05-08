@@ -3,16 +3,32 @@ import asyncHandler from "../utils/asyncHandler.js"
 
 // Create a new account
 export const createAccount = asyncHandler(async (req, res) => {
-  const { service, owner, credentials } = req.body
+  const { service, owner, accountNumber, credentials } = req.body
 
   if (!service || !owner || !credentials || credentials.length === 0) {
     res.status(400)
     throw new Error("Service, owner, and at least one credential are required.")
   }
 
+  const existingAccount = await Account.findOne({
+    service,
+    owner,
+    accountNumber: accountNumber || 1,
+  })
+
+  if (existingAccount) {
+    res.status(400)
+    throw new Error(
+      `${service} account for ${owner} already exists with account number ${
+        accountNumber || 1
+      }.`
+    )
+  }
+
   const newAccount = new Account({
     service,
     owner,
+    accountNumber,
     credentials,
   })
 
@@ -64,15 +80,16 @@ export const getAccountsByServiceAndOwner = asyncHandler(async (req, res) => {
 
 // Update the credentials of an account
 export const updateAccountCredentials = asyncHandler(async (req, res) => {
-  const { service, owner } = req.params
-  const { credentials } = req.body
+  const { service, owner, accountNumber, credentials } = req.body
 
-  if (!credentials || credentials.length === 0) {
+  if (!service || !owner || !accountNumber || !credentials) {
     res.status(400)
-    throw new Error("At least one credential is required.")
+    throw new Error(
+      "Service, owner, account number, and credentials are required."
+    )
   }
 
-  const account = await Account.findOne({ service, owner })
+  const account = await Account.findOne({ service, owner, accountNumber })
 
   if (!account) {
     res.status(404)
@@ -87,21 +104,24 @@ export const updateAccountCredentials = asyncHandler(async (req, res) => {
 
 // Delete an account
 export const deleteAccount = asyncHandler(async (req, res) => {
-  const { service, owner } = req.params
+  const { service, owner, accountNumber } = req.params
+  const { confirm } = req.body
 
-  const accounts = await Account.find({ service, owner })
-
-  if (accounts.length > 1) {
+  if (!service || !owner || !accountNumber || confirm !== true) {
     res.status(400)
-    throw new Error("Multiple accounts found. Please delete them separately.")
+    throw new Error(
+      "Service, owner, account number, and confirmation are required."
+    )
   }
 
-  const deletedAccount = await Account.findOneAndDelete({ service, owner })
+  const account = await Account.findOne({ service, owner, accountNumber })
 
-  if (!deletedAccount) {
+  if (!account) {
     res.status(404)
     throw new Error("Account not found.")
   }
+
+  await account.deleteOne()
 
   res.status(200).json({ message: "Account deleted successfully." })
 })
