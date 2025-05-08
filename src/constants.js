@@ -6,6 +6,14 @@ export const serviceList = [
   "linkedin",
   "github",
   "discord",
+  "meroshare",
+  "tms38",
+  "tms48",
+  "connectips",
+  "mobilebanking",
+  "esewa",
+  "imepay",
+  "sip",
 ]
 
 export const ownerList = [
@@ -13,11 +21,11 @@ export const ownerList = [
   "chintamani jaishi",
   "harikala jaishi",
   "parwati jaishi",
-  "kriti jaishi",
+  "kritika jaishi",
   "himani jaisi",
   "aardhya jaisi",
   "aarad jaisi",
   "aakriti jaisi",
   "anisha thapa magar",
-  "kunti thapa magar",
+  "kunti devi thapa magar",
 ]
