@@ -96,7 +96,30 @@ export const updateAccountCredentials = asyncHandler(async (req, res) => {
     throw new Error("Account not found.")
   }
 
-  account.credentials = credentials
+  credentials.forEach((cred) => {
+    const existingCredential = account.credentials.find(
+      (c) => c.field === cred.field
+    )
+
+    if (existingCredential) {
+      if (existingCredential.value === cred.value) {
+        return
+      }
+      existingCredential.history.push({
+        oldValue: existingCredential.value,
+        changedAt: new Date(),
+      })
+
+      existingCredential.value = cred.value
+    } else {
+      account.credentials.push({
+        field: cred.field,
+        value: cred.value,
+        history: [],
+      })
+    }
+  })
+
   await account.save()
 
   res.status(200).json(account)

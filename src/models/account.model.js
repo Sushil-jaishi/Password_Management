@@ -29,6 +29,15 @@ const accountSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
+        history: [
+          {
+            oldValue: String,
+            changedAt: {
+              type: Date,
+              default: Date.now,
+            },
+          },
+        ],
       },
     ],
   },
