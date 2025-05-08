@@ -6,11 +6,14 @@ import {
   getAccountsByServiceAndOwner,
   updateAccountCredentials,
   deleteAccount,
+  getAllAccounts,
 } from "../controllers/account.controller.js"
 
 const router = express.Router()
 
 router.post("/", createAccount)
+
+router.get("/", getAllAccounts)
 
 router.get("/owner/:owner", getAccountsByOwner)
 

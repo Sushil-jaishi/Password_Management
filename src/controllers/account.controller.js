@@ -41,7 +41,28 @@ export const createAccount = asyncHandler(async (req, res) => {
 
   await newAccount.save()
 
-  res.status(201).json(newAccount)
+  const decryptedAccount = {
+    ...newAccount.toObject(),
+    credentials: decryptCredentials(newAccount.credentials),
+  }
+
+  res.status(201).json(decryptedAccount)
+})
+
+export const getAllAccounts = asyncHandler(async (req, res) => {
+  const accounts = await Account.find()
+
+  if (accounts.length === 0) {
+    res.status(404)
+    throw new Error("No accounts found.")
+  }
+
+  const decryptedAccounts = accounts.map((account) => ({
+    ...account.toObject(),
+    credentials: decryptCredentials(account.credentials),
+  }))
+
+  res.status(200).json(decryptedAccounts)
 })
 
 // Get all accounts for a specific user (owner)
@@ -145,7 +166,12 @@ export const updateAccountCredentials = asyncHandler(async (req, res) => {
 
   await account.save()
 
-  res.status(200).json(account)
+  const decryptedAccount = {
+    ...account.toObject(),
+    credentials: decryptCredentials(account.credentials),
+  }
+
+  res.status(200).json(decryptedAccount)
 })
 
 // Delete an account
